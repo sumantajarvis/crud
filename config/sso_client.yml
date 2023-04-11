@@ -1,0 +1,15 @@
+defaults: &DEFAULTS
+  auth_server: <%= ENV['AUTH_SERVER'] %>
+  sign_out_url:
+  client_id: <%= ENV['CLIENT_ID'] %>
+  callback_url: <%= ENV['CALLBACK_URL'] %>
+  client_app_permission: <%= ENV['CLIENT_APP_PERMISSION'] %>
+
+development:
+  <<: *DEFAULTS
+
+test:
+  <<: *DEFAULTS
+
+production:
+  <<: *DEFAULTS
