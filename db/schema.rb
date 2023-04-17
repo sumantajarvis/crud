@@ -90,7 +90,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_11_052238) do
     t.string "name", null: false
     t.string "role", null: false
     t.string "phone_number", null: false
-    t.json "sso_payload", default: "{}", null: false
+    t.jsonb "sso_payload", default: "{}", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

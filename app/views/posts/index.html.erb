@@ -1,14 +1,33 @@
 <p style="color: green"><%= notice %></p>
 
 <h1>Posts</h1>
-
+<% has_read = false, has_create = false, has_delete = false, has_update = false %>
+<% @user.user_permissions.each do |up| %>
+  <% if up.app_permission_id == 4 %>
+    <% has_read = true %>
+  <% elsif up.app_permission_id == 3 %>
+    <% has_create = true %>
+  <% elsif up.app_permission_id == 2 %>
+    <% has_update = true %>
+  <% elsif up.app_permission_id == 1 %>
+    <% has_delete = true %>
+  <% end %>
+<% end %>
 <div id="posts">
-  <% @posts.each do |post| %>
-    <%= render post %>
-    <p>
-      <%= link_to "Show this post", post %>
-    </p>
+  <% if has_read == true%>
+      <% @posts.each do |post| %>
+        <%= render post %>
+        <p>
+          <% if has_update %>
+            <%= link_to "Show this post", post %> |
+          <% end %>
+          <% if has_delete %>
+            <%= button_to "Destroy this post", post, method: :delete %>
+          <% end %>
+        </p>
+      <% end %>
   <% end %>
 </div>
-
-<%= link_to "New post", new_post_path %>
+<% if has_create == true%>
+    <%= link_to "New post", new_post_path %>
+<% end %>
