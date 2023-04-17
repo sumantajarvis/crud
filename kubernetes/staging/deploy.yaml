@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app: crud-repo-staging
+    tier: backend
+  name: common
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: crud-repo-staging
+  name: crud-repo-deploy-staging
+  namespace: common
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: crud-repo-staging
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: crud-repo-staging
+        release: r11082019
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: crud-repo-staging-config
+          image: gcr.io/bjp-saral/github.com/jarvisconsulting/crud-repo
+          imagePullPolicy: IfNotPresent
+          name: crud-repo-container-staging
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 2048Mi
+            requests:
+              cpu: 500m
+              memory: 1024Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - envFrom:
+            - configMapRef:
+                name: crud-repo-staging-config
+          args:
+            - sidekiq
+          command:
+            - bundle
+            - exec
+          image: gcr.io/bjp-saral/github.com/jarvisconsulting/crud-repo
+          imagePullPolicy: IfNotPresent
+          name: crud-repo-sidekiq-staging
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 2048Mi
+            requests:
+              cpu: 500m
+              memory: 500Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - name: redis
+          image: redis:7.0.4
+          imagePullPolicy: IfNotPresent
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: { }
+      terminationGracePeriodSeconds: 30
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: crud-repo-staging
+  name: crud-repo-service-staging
+  namespace: common
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app: crud-repo-staging
+  sessionAffinity: None
+  type: LoadBalancer
