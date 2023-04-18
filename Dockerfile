@@ -26,7 +26,7 @@ COPY . .
 #RUN chmod +x entrypoint.sh
 #COPY .env.example .env
 RUN bundle install
-RUN bundle add redis
+#RUN bundle add redis
 #RUN bundle update saral-locatable
 #RUN rails webpacker:install
 RUN bundle exec rails assets:precompile
